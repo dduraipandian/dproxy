@@ -41,15 +41,31 @@ class ProxyLog{
     }
     getMessage(stage){     
         let data = {
+            type: "log",
             app_trace_id: appTraceID,
             app: this.app,
             module: this.module,
             user: "system",            
-            rid: null,                         
-            stage: stage.stage.toUpperCase(), 
+            rid: null,                                     
             url: null,
-            text: stage.message,
+            stage: stage.stage.toUpperCase(), 
+            message: stage.message,
         }
+        return JSON.stringify(data);
+    }
+    getMetricMessage(metric){     
+        let data = {
+            type: "metric",            
+            unit: metric.unit,
+            app_trace_id: appTraceID,
+            protocol: this.protocol,
+            app: this.app,
+            user: this.user.name || this.user.id,
+            rid: this.rid,            
+            url: this.url
+        }
+        const metricMessage = metric.getMessage();
+        data = { ...data, ...metricMessage}
         return JSON.stringify(data);
     }
     error(stage){
@@ -64,6 +80,9 @@ class ProxyLog{
     debug(stage){
         if(this.verbose) 
             logger.debug(this.getMessage(stage));
+    }
+    metric(metric){
+        logger.info(this.getMetricMessage(metric));
     }
 }
 
@@ -82,8 +101,9 @@ class ProxyRequestLog extends ProxyLog{
         this.protocol = params.protocol
         this.start()
     }
-    getMessage(stage){     
+    getMessage(stage, type="log"){     
         let data = {
+            type: type,
             app_trace_id: appTraceID,
             app: this.app,
             module: this.module,
@@ -92,7 +112,7 @@ class ProxyRequestLog extends ProxyLog{
             stage: stage.stage.toUpperCase(), 
             protocol: this.protocol,
             url: this.url,
-            text: stage.message,
+            message: stage.message,
         }
         return JSON.stringify(data);
     }
@@ -102,10 +122,11 @@ class ProxyRequestLog extends ProxyLog{
     start(){
         if(!this.started) requestStatistics.total += 1;
         this.start_time = new Date();
-        let stage = stages.BeginStage(this.start_time);   
+        let stage = stages.BeginStage(`Starting the request`);   
         this.info(stage);   
     }
     finish({...status}){
+        let metric = status.metric;
         if(!this.finished){
             if (status.success) requestStatistics.success += 1;
             else if (!status.success) requestStatistics.failure += 1;
@@ -115,12 +136,11 @@ class ProxyRequestLog extends ProxyLog{
             this.warn(stage);
         }        
         this.end_time = new Date();
-        let run_time_ms = this.getRunTime();        
-        if(run_time_ms >= criticalRunTimeMS){
-            let success = status.success || false;
-            let stage = stages.FinishStage({run_time_ms, success});  
-            logger.info(this.getMessage(stage));
-        }         
+        let run_time_ms = this.getRunTime();                
+        if(metric) {
+            metric.setRunTime(run_time_ms);
+            this.metric(metric)  
+        }  
     }    
 }
 

@@ -2,6 +2,7 @@
 
 const url = require('url');
 const stages = require("./stages");
+const Metric = require("./metrics");
 const stats = require("./stats");
 const utils = require("./utils");
 
@@ -16,6 +17,7 @@ class ProxyRequest {
         this.rid = rid;
         this.user = user;
         this.protocol = protocol;
+        this.metric = new Metric();
         this.log = stats.getRequestLog(this.rid, this.url, this.user, "request", protocol);
         this.debug(stages.UserStage, "Fetched user from DB.");
     }
@@ -42,7 +44,8 @@ class ProxyRequest {
 
     finish(stageFunction) {
         this.debug(stageFunction, `Proxy completed success=(${this.success}).`);
-        this.log.finish({ success: this.success });
+        this.metric.setSuccess(this.success);
+        this.log.finish({ success: this.success, metric: this.metric });
     }
 
     getResponseSize(targetResponse) {
@@ -60,15 +63,16 @@ class ProxyRequest {
     }
 
     getDataTransferSize(socket, response) {
-        this.dataTransferSize = socket ? socket.bytesRead : 0;
+        let dataTransferSize = socket ? socket.bytesRead : 0;
         // you can not read response data for https connection as it is tunnelled and secured.
         // socket.bytesRead will be much less than what you see as response size, 
         // because it is compressed using gzip. to request plain text 
         // use header "Accept-Encoding": "identity"
         // https://www.rfc-editor.org/rfc/rfc9110.html#name-accept-encoding 
-        this.responseSize = response ? this.getResponseSize(response) : null;        
-        this.debug(stages.ResponseAnalysisStage, `dataTransferSize: ${this.dataTransferSize}`);
-        this.debug(stages.ResponseAnalysisStage, `responseSize: ${this.responseSize}`);
+        let responseSize = response ? this.getResponseSize(response) : null;  
+        this.metric.setDataTransferSize(dataTransferSize);
+        this.metric.setResponseSize(responseSize);
+
     }
 
     getResponseHeaders(rawHeaders) {
