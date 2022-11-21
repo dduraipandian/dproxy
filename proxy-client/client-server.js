@@ -30,10 +30,9 @@ server.on('connect', (req, res) => handler(req, res, "https", connectHandler));
 server.on('request', (req, res) => handler(req, res, "http", requestHandler));
 
 server.listen(config.port, (err) => {
-    if (err) {
-        return console.error('cannot start proxy');
-    }
-
     const logger = stats.getLog("server");
+    if (err) {
+        return logger.error(stages.AppStartUpStage('cannot start proxy'))
+    }    
     logger.info(stages.AppStartUpStage(`proxy listening at port ${config.port}`));
 });

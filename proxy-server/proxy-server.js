@@ -73,10 +73,10 @@ server.on('connect', proxyHandler); // Accept client via CONNECT method
 server.on('request', serverHttpCallHandler); // Response to PING on GET /ping
 
 server.listen(config.port, err => {
-    if (err) {
-        return console.error('cannot start proxy');
-    }
     const logger = stats.getLog("server");
+    if (err) {
+        return logger.error(stages.AppStartUpStage('cannot start proxy'))
+    }    
     logger.info(stages.AppStartUpStage(`proxy listening at port ${config.port}`));
     // job.register() 
 
