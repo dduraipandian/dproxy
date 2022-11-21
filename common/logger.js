@@ -10,6 +10,7 @@ const options = {
         level: settings.LOGLEVEL,
         filename: `${settings.APP_ROOT}/../logs/${settings.APP_NAME}.log`,
         handleExceptions: true,
+        prettyPrint: false,
         json: false,
         maxsize: 10240000, // 10MB
         maxFiles: 200, // keep latest 200 files
@@ -31,8 +32,8 @@ const logger = winston.createLogger({
         winston.format.timestamp(),
         winston.format.splat(),
         winston.format.prettyPrint(),
-        winston.format.printf(i => {
-            return `${i.timestamp} - ${i.level.toUpperCase()}: ${i.message}`
+        winston.format.printf(i => {            
+            return `${i.timestamp} ${i.level.toUpperCase()} ${i.message}`;            
         }),
       ),
     transports: [

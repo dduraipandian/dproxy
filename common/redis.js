@@ -2,12 +2,14 @@
 
 const util = require('util');
 const redis_ = require("redis");
-const winston = require('./logger');
+const stages = require("../common/stages");
+const stats = require("../common/stats");
 const settings = require('./settings');
+
+const logger = stats.getLog("redis");
 
 const PROXY_IP_REDIS_DB = settings.PROXY_IP_REDIS_DB;
 
-winston.info(`${settings.REDIS_URL}/${PROXY_IP_REDIS_DB}`);
 
 const redis = redis_.createClient({
   url: `${settings.REDIS_URL}/${PROXY_IP_REDIS_DB}`,
@@ -16,14 +18,14 @@ const redis = redis_.createClient({
       // End reconnecting on a specific error and flush all commands with
       // a individual error
       const error = "Not able to connect to redis server. The redis server refused the connection.";
-      winston.error(error);
+      logger.error(stages.AppStartUpStage(error));
       return new Error(error);
     }
     if (options.total_retry_time > 1000 * 60 * 60) {
       // End reconnecting after a specific timeout and flush all commands
       // with a individual error
       const error = "Not able to connect to redis server. Retry time exhausted.";
-      winston.error(error);
+      logger.error(stages.AppStartUpStage(error));
       return new Error(error);
     }
     if (options.attempt > 3) {
@@ -37,12 +39,12 @@ const redis = redis_.createClient({
 
 redis.connect();
 
-redis.on("error", (error) => {
-  winston.error(error.stack);
+redis.on("error", (error) => {  
+  logger.error(stages.AppStartUpStage(error));
 });
 
 redis.on("connect", (error) => {
-  winston.info("Connected to redis server.");
+  logger.info(stages.AppStartUpStage("Connected to redis server."));
 });
 
 const sPop = util.promisify(redis.sPop).bind(redis);

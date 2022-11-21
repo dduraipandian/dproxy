@@ -6,7 +6,7 @@ const APP_ROOT = require.main.path;
 
 const APP_PORT = process.env.PORT;
 const APP_NAME = path.basename(APP_ROOT);
-const LOGLEVEL = process.env.LOGLEVEL || "info";
+const LOGLEVEL = process.env.LOGLEVEL || "debug";
 
 const REDIS_URL = process.env.REDIS_URL || null;
 const EMAIL_SERVER = process.env.EMAIL_SERVER || null;

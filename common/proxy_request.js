@@ -8,14 +8,15 @@ const utils = require("./utils");
 const basicAuth = utils.getBasicAuth();
 
 class ProxyRequest {
-    constructor(request, response, rid, user, app="proxy-server") {
+    constructor(request, response, rid, user, protocol) {
         this.success = true;
         this.request = request;
         this.response = response;
         this.url = this.request.url;
         this.rid = rid;
         this.user = user;
-        this.log = stats.getLog(this.rid, this.url, this.user, app);
+        this.protocol = protocol;
+        this.log = stats.getRequestLog(this.rid, this.url, this.user, "request", protocol);
         this.debug(stages.UserStage, "Fetched user from DB.");
     }
 

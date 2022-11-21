@@ -18,10 +18,10 @@ function getUser(request) {
 }
 
 class ProxyClientRequest extends ProxyRequest {
-    constructor(request, response, app="proxy-client") {
+    constructor(request, response, protocol, app="proxy-client") {
         let rid = crypto.randomUUID()
         let user = getUser(request);
-        super(request, response, rid, user, app);
+        super(request, response, rid, user, app, protocol);
         this.validateUrl();
     }
 
@@ -54,9 +54,8 @@ class ProxyClientRequest extends ProxyRequest {
     }
 }
 class HTTPSProxyRequest extends ProxyClientRequest {
-    constructor(request, response) {
-        super(request, response);
-        this.validateUrl();
+    constructor(request, response, protocol) {
+        super(request, response, protocol);
     }
     writeEndClient(code, message) {
         return utils.writeEndSocket(this.response, code, message, opts)
@@ -93,6 +92,9 @@ class HTTPSProxyRequest extends ProxyClientRequest {
 }
 
 class HTTPProxyRequest extends HTTPSProxyRequest {    
+    constructor(request, response, protocol) {
+        super(request, response, "http");
+    }
     writeEndClient(code, message) {
         return utils.writeEndRequest(this.response, code, message, opts)
     }

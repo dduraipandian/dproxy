@@ -22,7 +22,7 @@
                 "PORT": "3000",
                 "LOGLEVEL": "debug",
                 "REDIS_URL": "redis://localhost:6379",
-                "SYNC_TIMER": "10"
+                "HEARTBEAT_INTERVAL": "10"
             },
             "args": ["--trace-sync-io"],
             "restart": true,

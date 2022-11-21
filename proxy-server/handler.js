@@ -45,7 +45,7 @@ function serverConnect(proxyAppRequest, head, params) {
 
     targetSocket.on('error', (err) => {
         proxyAppRequest.handlerError(stages.TargetCommunicationStage, err);
-        targetSocket.destroy();
+        // return targetSocket.destroy();
         return clientResponseSocket.destroy();
     });
 

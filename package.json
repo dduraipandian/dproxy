@@ -3,7 +3,9 @@
     "express": "^4.18.2",
     "lodash": "^4.17.21",
     "logplease": "^1.2.15",
-    "request": "^2.88.2"
+    "redis": "^4.5.0",
+    "request": "^2.88.2",
+    "winston": "^3.8.2"
   },
   "name": "dproxy",
   "version": "1.0.0",

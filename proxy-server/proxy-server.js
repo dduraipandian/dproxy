@@ -5,10 +5,12 @@ const http = require('http');
 const User = require("../common/user");
 const utils = require("../common/utils");
 const stages = require("../common/stages");
+const stats = require("../common/stats");
 const ProxyRequest = require("../common/proxy_request");
 
 const handler = require('./handler');
 const monitoring = require('./monitoring');
+const job = require("./job");
 
 const config = {
     port: process.env.port || 3048,
@@ -74,5 +76,8 @@ server.listen(config.port, err => {
     if (err) {
         return console.error('cannot start proxy');
     }
-    console.log('proxy listening at port %d', config.port);
+    const logger = stats.getLog("server");
+    logger.info(stages.AppStartUpStage(`proxy listening at port ${config.port}`));
+    // job.register() 
+
 });

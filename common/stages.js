@@ -16,6 +16,12 @@ function getStageInstance({ ...params }) {
     return new LogStage({ ...params })
 }
 
+const AppStartUpStage = (message) => getStageInstance({
+    stage: "app_start",
+    user_response: null,
+    message: message
+})
+
 const UserStage = (message) => getStageInstance({
     stage: "user",
     user_response: null,
@@ -73,7 +79,7 @@ const TargetSocketStage = (message) => getStageInstance({
     message: message
 })
 const TargetCommunicationStage = (message) => getStageInstance({
-    stage: "target_connection",
+    stage: "target_transfer",
     message: message,
     user_response: "Connection to the url is idle for long time without any data transfer. Check if the given url is functioning in the browser and reach out to suppot@scraperant.com for further assistance."
 })
@@ -120,6 +126,8 @@ const ResponseAnalysisStage = (message) => getStageInstance({
 
 
 module.exports = {
+    AppStartUpStage,
+    
     UserStage,
 
     PayloadParsingStage,
