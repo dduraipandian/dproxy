@@ -66,12 +66,9 @@ class ProxyRequest {
         // because it is compressed using gzip. to request plain text 
         // use header "Accept-Encoding": "identity"
         // https://www.rfc-editor.org/rfc/rfc9110.html#name-accept-encoding 
-        this.responseSize = response ? this.getResponseSize(response) : null;
-        let dataSize = {
-            dataTransferSize: this.dataTransferSize,
-            responseSize: this.responseSize
-        };
-        this.debug(stages.ResponseAnalysisStage, dataSize);
+        this.responseSize = response ? this.getResponseSize(response) : null;        
+        this.debug(stages.ResponseAnalysisStage, `dataTransferSize: ${this.dataTransferSize}`);
+        this.debug(stages.ResponseAnalysisStage, `responseSize: ${this.responseSize}`);
     }
 
     getResponseHeaders(rawHeaders) {
