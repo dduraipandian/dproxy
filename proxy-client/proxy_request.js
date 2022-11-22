@@ -115,8 +115,8 @@ class HTTPProxyRequest extends HTTPSProxyRequest {
             headers[key] = val;
         });
 
-        this.debug(stages.TargetCommunicationStage, { rawHeaders, headers });
-        this.debug(stages.TargetCommunicationStage, "SanitizeHeaders completed.");
+        // this.debug(stages.TargetCommunicationStage, { rawHeaders, headers });
+        // this.debug(stages.TargetCommunicationStage, "SanitizeHeaders completed.");
         return headers;
     }
 

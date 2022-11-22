@@ -38,7 +38,7 @@ class ProxyRequest {
         this.success = false;
         let stage = stageFunction(err.stack || err);
         this.log.error(stage);
-        this.log.finish({ success: this.success });
+        this.finish(stageFunction);
         return stage
     }
 
