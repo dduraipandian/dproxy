@@ -45,13 +45,13 @@ function serverConnect(proxyAppRequest, head, params) {
 
     targetSocket.on('error', (err) => {
         proxyAppRequest.handlerError(stages.TargetCommunicationStage, err);
-        // return targetSocket.destroy();
         return clientResponseSocket.destroy();
     });
 
     targetSocket.on('end', () => {
         proxyAppRequest.getDataTransferSize(targetSocket, null);
         proxyAppRequest.finish(stages.TargetConnEndStage);
+        targetSocket.destroy()
     });
 }
 

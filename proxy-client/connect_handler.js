@@ -52,6 +52,7 @@ function connect(proxyAppRequest) {
         proxyConnectionSocket.on('end', () => {
             proxyAppRequest.getDataTransferSize(proxyConnectionSocket, null);
             proxyAppRequest.finish(stages.ProxyConnEndStage);
+            return proxyRequest.destroy();
         });
 
         clientResponseSocket.write('HTTP/1.1 200 Connection established\r\n\r\n');
