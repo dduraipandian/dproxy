@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 const User = require("../common/user");
 const stages = require("../common/stages");
-const ProxyRequest = require("../common/proxy_request");
+const proxyRequest = require("../common/proxy_request");
 
 const ProxyAgent = require('./proxy_agent');
 const utils = require('./utils');
@@ -17,7 +17,7 @@ function getUser(request) {
     return new User("dummy");
 }
 
-class ProxyClientRequest extends ProxyRequest {
+class ProxyClientRequest extends proxyRequest.ProxyRequest {
     constructor(request, response, protocol) {
         let rid = crypto.randomUUID()
         let user = getUser(request);

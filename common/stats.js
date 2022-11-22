@@ -15,12 +15,6 @@ let appLogger = null;
 
 let appTraceID = crypto.randomUUID();
 
-let requestStatistics = {
-    success: 0,
-    failure: 0,
-    total: 0
-};
-
 
 function getRequestLog(rid, url, user, module, protocol){        
     let verbose = user.getProxyClientVerboseSetting()
@@ -94,12 +88,7 @@ class ProxyRequestLog extends ProxyLog{
         this.rid = params.rid;
         this.verbose = params.verbose || false;
         this.mode = params.mode;
-        this.started = false;
-        this.finished = false;
-        this.start_time = null;
-        this.end_time = null;
-        this.protocol = params.protocol
-        this.start()
+        this.protocol = params.protocol        
     }
     getMessage(stage, type="log"){     
         let data = {
@@ -115,38 +104,11 @@ class ProxyRequestLog extends ProxyLog{
             message: stage.message,
         }
         return JSON.stringify(data);
-    }
-    getRunTime(){
-        return this.end_time - this.start_time;
-    }    
-    start(){
-        if(!this.started) requestStatistics.total += 1;
-        this.start_time = new Date();
-        let stage = stages.BeginStage(`Starting the request`);   
-        this.info(stage);   
-    }
-    finish({...status}){
-        let metric = status.metric;
-        if(!this.finished){
-            if (status.success) requestStatistics.success += 1;
-            else if (!status.success) requestStatistics.failure += 1;
-            this.finished = true;
-        } else {
-            let stage = stages.FinishStage("Can not call finish() multiple times in the process.");   
-            this.warn(stage);
-        }        
-        this.end_time = new Date();
-        let run_time_ms = this.getRunTime();                
-        if(metric) {
-            metric.setRunTime(run_time_ms);
-            this.metric(metric)  
-        }  
-    }    
+    }          
 }
 
 
-module.exports = {
-    requestStatistics,
+module.exports = {    
     getRequestLog,
     getLog
 }

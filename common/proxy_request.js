@@ -8,6 +8,12 @@ const utils = require("./utils");
 
 const basicAuth = utils.getBasicAuth();
 
+let requestStatistics = {
+    success: 0,
+    failure: 0,
+    total: 0
+};
+
 class ProxyRequest {
     constructor(request, response, rid, user, protocol) {
         this.success = true;
@@ -20,6 +26,19 @@ class ProxyRequest {
         this.metric = new Metric();
         this.log = stats.getRequestLog(this.rid, this.url, this.user, "request", protocol);
         this.debug(stages.UserStage, "Fetched user from DB.");
+        this.start_time = null;
+        this.end_time = null;
+        this.finished = false;
+        this.start()
+    }
+    getRunTime(){
+        return this.end_time - this.start_time;
+    }  
+    start(){
+        requestStatistics.total += 1;
+        this.start_time = new Date();
+        let stage = stages.BeginStage(`Starting the request`);   
+        this.log.info(stage);   
     }
 
     debug(stageFunction, message) {
@@ -42,10 +61,23 @@ class ProxyRequest {
         return stage
     }
 
-    finish(stageFunction) {
+    finish(stageFunction) {         
+        if(this.finished){
+            let stage = stages.FinishStage("Can not call finish() multiple times in the process.");   
+            this.log.warn(stage);
+            return;
+        }            
+        
+        if (this.success) requestStatistics.success += 1;
+        else if (!this.success) requestStatistics.failure += 1;
+        
         this.debug(stageFunction, `Proxy completed success=(${this.success}).`);
         this.metric.setSuccess(this.success);
-        this.log.finish({ success: this.success, metric: this.metric });
+        this.end_time = new Date();
+        let run_time_ms = this.getRunTime();                
+        this.metric.setRunTime(run_time_ms);
+        this.finished = true;                
+        this.log.metric(this.metric);      
     }
 
     getResponseSize(targetResponse) {
@@ -119,4 +151,7 @@ class ProxyRequest {
 }
 
 
-module.exports = ProxyRequest
+module.exports = {
+    ProxyRequest,
+    requestStatistics,
+}

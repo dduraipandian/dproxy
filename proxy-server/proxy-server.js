@@ -6,7 +6,7 @@ const User = require("../common/user");
 const utils = require("../common/utils");
 const stages = require("../common/stages");
 const stats = require("../common/stats");
-const ProxyRequest = require("../common/proxy_request");
+const proxyRequest_ = require("../common/proxy_request");
 
 const handler = require('./handler');
 const monitoring = require('./monitoring');
@@ -28,7 +28,7 @@ function proxyHandler(clientRequest, clientResponseSocket, head) {
     let user = getUser(rawHeaders);
     let timeoutSecs = rawHeaders["Proxy-Request-Timeout"] || 180;
 
-    const proxyRequest = new ProxyRequest(clientRequest, clientResponseSocket, rid, user);
+    const proxyRequest = new proxyRequest_.ProxyRequest(clientRequest, clientResponseSocket, rid, user);
 
     const token = proxyRequest.getBasicAuthToken();
 
